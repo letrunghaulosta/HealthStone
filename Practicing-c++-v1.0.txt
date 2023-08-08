@@ -1,0 +1,53 @@
+Time: 4 weeks - 30% efforts 
+- Start : 01-Aug-2023
+
+1. Goal: Hands on C++ experiences
+    1.1  OOP concept - Smart Pointer
+	1.2. Cmake build system
+	1.3  Design patterns
+	1.4. Software Design
+	1.5. UML diagram (class diagram, sequence diagram, component diagram)
+	1.6. Unit testing (gmock, gtest) - generate by LCOV
+
+2. Environment:
+    - Build and run on Linux.
+	- Code will be stored on Gerrit.
+
+3. Expected output
+	3.1. Understand OOP and can design the software to use OOP effectively. Must use smart pointer for creating pointers.
+	3.2. Can config the project to build with Cmake.
+	3.3. Use at least 2 different design patterns in the design. (Factory Pattern, Decorator Pattern + Template).
+	3.4. Has UML diagram about design of the software. Requires at least component diagram, class diagram and sequence diagram of main flow.
+	3.5. Config project to run unit test and generate coverage report. Requires at least 10% branch coverage and 100% file coverage.
+	3.6. UT with 85% condition coverage (optional).
+	
+4. Problem 1 - The HearthStone
+	- This is a game bases on "HearthStones: Heroes of Warcraft" game of Blizzard. You should take a look at the original game concept first (on google).
+	4.1. Requirements
+		4.1.1 The game shall allow 2 players play turn by turn.
+		4.1.2 There are 2 heroes in the game: Butcher and Slark.
+			- Butcher has 120 HP and 6 Attack.
+			- Slark has 72 HP and 10 Attack.
+		4.1.3. There are 5 types of card:
+			- "Ragnaros the Firelord" - A minion with 1HP and 3 Attack.
+			- "Bloodmage Thalnos" - A minion with 1HP and 1 Attack.
+			- "Flametongue Totem" - A shaman with 3HP and 0 Attack, but provides all alliance minions with a +1 Attack bonus.
+			- "Brawl" - Destroy a random minion of the opposite player - Just use only 1 time.
+			- "Techies" - A minion with 2HP and 1 Attack. On dead it deals 3 damage to both hero.
+		4.1.4. Enter the game, each player is random a hero and 10 cards from the board (player is able to hold card of the same type).
+		4.1.5 Each turn, a player can activate a card and place it into the battle. The card take effect immediately from that turn.
+		4.1.6 When an unit has 0 HP, it's removed from the battle, player lose that card.
+		4.1.7 A hero only attack the other hero. Minion/shaman deals damage to all units.
+		4.1.8 Player is defeated when his hero has 0 HP.
+		4.1.9 When a turn finishes, player shall be able to see remaining HP and Attack of all units in the battle.
+	4.2. Definition of Done
+		4.2.1. Game is built (with Cmake) and run successfully.
+		4.2.2. All requirements are fulfilled.
+		4.2.3. Use at least 2 design patterns in the software
+		4.2.4. At least component diagram, class diagram and sequence diagram of main flow are available.
+		4.2.5. Unit test report with at least 10% branch coverage and 100% file coverage.
+5. Problem 2 - The HearthStone - Extension pack
+	- Do this after complete "The HearthStone".
+	5.1. Requirements
+		5.1.1. Every 2 turns, the player receives a random card from the board.
+		5.1.2. 2 players shall be able to play the game from 2 different device (terminal).
