@@ -1,0 +1,17 @@
+cmake_minimum_required(VERSION 3.10)
+
+#set project name
+project(HealthStone)
+
+#add the executable
+add_executable(HealthStone main.cpp
+                           src/Console.cpp)
+
+target_include_directories(HealthStone PUBLIC
+"${CMAKE_SOURCE_DIR}/inc"
+)
+
+set_target_properties(HealthStone
+    PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+)
