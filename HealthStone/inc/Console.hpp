@@ -3,10 +3,22 @@
 
 class Console
 {
+   enum ConsoleSM
+   {
+      ConsoleSM_Start,
+      ConsoleSM_Running,
+      ConsoleSM_End
+   };
+
 public:
-   Console(){};
+   Console(){consoleSM = ConsoleSM_Start;};
    ~Console(){};
-   void GenerateHeader(void);
+   void MainFunction(void);
+   void GenerateStart(void);
+   void OnRunning(void);
+   void GenerateEnd(void);
+private:
+   static ConsoleSM consoleSM;
 };
 
 #endif
