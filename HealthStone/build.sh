@@ -44,7 +44,7 @@ help()
     echo -e "Usage of $0"
     echo -e "--help"
     echo -e "--clean  Clean generated"
-    echo -e "--run  Build and Run"
+    echo -e "--run Run"
 }
 
 # clean variables
@@ -88,7 +88,10 @@ if [ "${_CLEAN}" == "true" ]; then
     clean
     exit 0
 fi
-
+if [ "${_RUN}" == "true" ]; then
+    run
+    exit 0
+fi
 (
 echo "===============Pre-Create================="
 preCreate
@@ -96,8 +99,6 @@ echo "=================INFORM==================="
 inform
 echo "=================BUILD===================="
 build
+run
 ) 2>&1 | tee $LOGFILE
 
-if [ "${_RUN}" == "true" ]; then
-    run
-fi
