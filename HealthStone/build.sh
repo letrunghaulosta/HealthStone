@@ -1,5 +1,5 @@
 # Setup Env
-PROJECT_SOURCE_DIR=$(cygpath -m $PWD)
+PROJECT_SOURCE_DIR=$PWD #TODO
 PROJECT_BIN_DIR=$PROJECT_SOURCE_DIR/generated
 TOOLCHAIN_DIR=$PROJECT_SOURCE_DIR/build
 GENRATOR="Unix Makefiles"
@@ -36,7 +36,7 @@ clean()
 run()
 {
     clear
-    ./generated/HealthStone.exe
+    ./generated/HealthStone #TODO
 }
 
 help()
@@ -44,7 +44,8 @@ help()
     echo -e "Usage of $0"
     echo -e "--help"
     echo -e "--clean  Clean generated"
-    echo -e "--run Run"
+    echo -e "--run  Run"
+	echo -e "Build and run by default"
 }
 
 # clean variables

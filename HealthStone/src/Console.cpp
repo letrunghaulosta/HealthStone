@@ -5,24 +5,28 @@ using namespace std;
 
 void Console::GenerateStart()
 {
-   cout << "===========HEALTH STONE============" << endl;
-   cout << "Press enter to continue...";
+   char testc = 0;
+   system("clear");
+   cout << "===========HEALTH STONE============\n";
+   cout << "Press enter to continue...\n";
    cin.ignore();
-   SetSelect(ConsoleNext);
+   SetSelect(ConsoleNext);   
 }
 
 void Console::OnRunning()
 {
+   system("clear");
    cout << "===========On Running============" << endl;
-   cout << "Press enter to continue...";
+   cout << "Press enter to continue..." << endl;
    cin.ignore();
    SetSelect(ConsoleNext);
 }
 
 void Console::GenerateEnd()
 {
+   system("clear");
    cout << "=========== END ============" << endl;
-   cout << "Press enter to continue...";
+   cout << "Press enter to continue..." << endl;
    cin.ignore();
    isExit = true;
 }
