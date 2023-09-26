@@ -21,9 +21,11 @@ public:
       isExit = false;
       }
    ~Console(){};
-   void GenerateStart(void);
-   void OnRunning(void);
-   void GenerateEnd(void);
+   void OnStart(void);
+   void OnLoading(void);
+   void OnPlay(int8_t);
+   void OnProcess();
+   void OnEnd(void);
    void SetSelect(ConsoleSelectedType s){selected = s;}
    ConsoleSelectedType GetSelected(){return selected;}
    bool IsExit(){return isExit;}
@@ -50,11 +52,11 @@ public:
    virtual void next(ConsoleStateMachine &sm);
    virtual void back(ConsoleStateMachine &sm);
    virtual void select(ConsoleStateMachine &sm, uint8_t option);
-   ConsoleState_Root(){};
-   ~ConsoleState_Root(){};
+protected:
+   ConsoleState* GetParent(){return this;}
 };
 
-class ConsoleState_StartUp : public ConsoleState
+class ConsoleState_StartUp : public ConsoleState_Root
 {
 public:
    virtual void entry(ConsoleStateMachine &sm);
@@ -63,7 +65,7 @@ public:
    virtual void select(ConsoleStateMachine &sm, uint8_t option);
 };
 
-class ConsoleState_OnRunning : public ConsoleState
+class ConsoleState_OnRunning : public ConsoleState_Root
 {
 public:
    virtual void entry(ConsoleStateMachine &sm);
@@ -72,7 +74,34 @@ public:
    virtual void select(ConsoleStateMachine &sm, uint8_t option);
 };
 
-class ConsoleState_End : public ConsoleState
+class ConsoleState_OnPlayer1Turn : public ConsoleState_OnRunning
+{
+public:
+   virtual void entry(ConsoleStateMachine &sm);
+   virtual void next(ConsoleStateMachine &sm);
+   virtual void back(ConsoleStateMachine &sm);
+   virtual void select(ConsoleStateMachine &sm, uint8_t option);
+};
+
+class ConsoleState_OnPlayer2Turn : public ConsoleState_OnRunning
+{
+public:
+   virtual void entry(ConsoleStateMachine &sm);
+   virtual void next(ConsoleStateMachine &sm);
+   virtual void back(ConsoleStateMachine &sm);
+   virtual void select(ConsoleStateMachine &sm, uint8_t option);
+};
+
+class ConsoleState_OnProcess : public ConsoleState_OnRunning
+{
+public:
+   virtual void entry(ConsoleStateMachine &sm);
+   virtual void next(ConsoleStateMachine &sm);
+   virtual void back(ConsoleStateMachine &sm);
+   virtual void select(ConsoleStateMachine &sm, uint8_t option);
+};
+
+class ConsoleState_End : public ConsoleState_Root
 {
 public:
    virtual void entry(ConsoleStateMachine &sm);
@@ -95,6 +124,7 @@ public:
    Console* getActionInstance(){return console;}
 private:
    ConsoleState *consoleState;
+   ConsoleState *prevState;
    Console      *console;
 };
 

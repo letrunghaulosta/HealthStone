@@ -3,7 +3,7 @@
 
 #include <string>
 #include <cstdlib>
-#include <list>
+#include <vector>
 
 struct UnitInfoType
 {
@@ -11,18 +11,44 @@ struct UnitInfoType
    uint16_t    health;
    uint16_t    damage;
    uint8_t     type;
+   UnitManager::UnitType     id;
 };
 
 class UnitManager
 {
 public:
-   virtual void generate(void) = 0;
-   virtual void notify(void) = 0;
-   virtual void onAttacked(uint8_t) = 0;
-   virtual UnitInfoType getInformationById(uint8_t) = 0;
-   virtual void attack(uint8_t) = 0;
-private:
-   std::list<bool>  unitIdContainer;
-};
+   enum UnitType{
+      UM_TYPE_INVALID = -1,
+      UM_TYPE_HERO = 0,
+      UM_TYPE_CARD = 1
+   };
 
+   virtual void Generate(void) = 0;
+   virtual void OnAttacked(uint8_t, uint8_t) = 0;
+   virtual bool GetInformationById(uint8_t, UnitInfoType*) = 0;
+   virtual void Attack(uint8_t) = 0;
+   uint8_t AllocateID() {
+      for(auto it = unitIdContainer.begin(); it != unitIdContainer.end();it++)
+      {
+         if(false == *it)
+         {
+            *it = true;
+            return (it - unitIdContainer.begin());
+         }
+      }
+      unitIdContainer.push_back(true);
+      return unitIdContainer.size()-1;
+   };
+   void EraseID(uint8_t id)
+   {
+      if(id > unitIdContainer.size())
+      {
+         return;
+      }
+
+      unitIdContainer[id] = false;
+   }
+private:
+   static std::vector<bool> unitIdContainer;
+};
 #endif
