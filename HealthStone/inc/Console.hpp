@@ -2,7 +2,7 @@
 #define _CONSOLE_HPP_INC_
 
 #include <cstdint>
-
+#include <functional>
 class ConsoleStateMachine;
 
 class Console
@@ -13,13 +13,14 @@ public:
    {
       ConsoleNotSet,
       ConsoleNext,
-      ConsoleBack
+      ConsoleBack,
+      ConsoleSelect
    };
 
    Console(){
       selected = ConsoleNotSet;
       isExit = false;
-      }
+   }
    ~Console(){};
    void OnStart(void);
    void OnLoading(void);

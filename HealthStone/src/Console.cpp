@@ -3,10 +3,6 @@
 #include <iostream>
 
 using namespace std;
-void Console_NotifyEnd()
-{
-   
-}
 
 void Console::OnStart()
 {
@@ -31,9 +27,15 @@ void Console::OnPlay(int8_t player)
 {
    system("clear");
    cout << "===========PLAYER " << player + 1 << " TURN============\n";
-
-   UnitInfoType unitInfo;
-   GameController::GetInstance()->GetUnitInformation();
+   for(auto heroId : GameController::GetInstance()->GetHeroIdList((uint8_t)player))
+   {
+      UnitInfoType unitInfo;
+      GameController::GetInstance()->GetUnitInformation(heroId, &unitInfo);
+      cout << "ID: " << (int)heroId << endl;
+      cout << "Name:   " << unitInfo.name << endl;
+      cout << "Health: " << unitInfo.health << endl;
+      cout << "Damage: " << unitInfo.damage << endl;
+   }
    cout << "Press enter to continue..." << endl;
    cin.ignore();
    SetSelect(ConsoleNext);
@@ -42,9 +44,10 @@ void Console::OnProcess()
 {
    system("clear");
    cout << "===========On Process============\n";
+
    cout << "Press enter to continue..." << endl;
    cin.ignore();
-
+   SetSelect(ConsoleNext);
 }
 
 void Console::OnEnd()
@@ -53,7 +56,6 @@ void Console::OnEnd()
    cout << "=========== END ============" << endl;
    cout << "Press enter to continue..." << endl;
    cin.ignore();
-   isExit = true;
 }
 
 void ConsoleState::setState(ConsoleStateMachine &sm, ConsoleState *state)
@@ -130,6 +132,8 @@ void ConsoleState_OnPlayer1Turn::entry(ConsoleStateMachine &sm)
 {
    sm.getActionInstance()->SetSelect(Console::ConsoleNotSet);
    sm.getActionInstance()->OnPlay(GC_PLAYER_1);
+   std::cout << "PASS CALL SEELCT" << std::endl;
+   GameController::GetInstance()->Attack(0,1);
 }
 void ConsoleState_OnPlayer1Turn::next(ConsoleStateMachine &sm)
 {
@@ -141,7 +145,6 @@ void ConsoleState_OnPlayer1Turn::back(ConsoleStateMachine &sm)
 }
 void ConsoleState_OnPlayer1Turn::select(ConsoleStateMachine &sm, uint8_t option)
 {
-   return this->GetParent()->select(sm,option);
 }
 /***ConsoleState_OnPlayer2Turn**/
 void ConsoleState_OnPlayer2Turn::entry(ConsoleStateMachine &sm)
@@ -164,6 +167,8 @@ void ConsoleState_OnPlayer2Turn::select(ConsoleStateMachine &sm, uint8_t option)
 /***ConsoleState_OnProcess**/
 void ConsoleState_OnProcess::entry(ConsoleStateMachine &sm)
 {
+   sm.getActionInstance()->SetSelect(Console::ConsoleNotSet);
+   sm.getActionInstance()->OnProcess();
    GameController::GetInstance()->ChangePlayerTurn();
 }
 void ConsoleState_OnProcess::next(ConsoleStateMachine &sm)

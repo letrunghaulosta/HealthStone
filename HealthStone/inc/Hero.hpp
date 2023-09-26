@@ -16,7 +16,7 @@ public:
    std::string getName(void) {return name;}
    uint16_t getHealth(void) {return health;}
    uint16_t getDamage(void) {return damage;}
-   void OnAttacked(uint16_t val) { health = (val > health) ? (health - val): 0;}
+   void OnAttacked(uint16_t val) { health = (val > health) ? 0:(health - val);}
 private:
    std::string name;
    uint16_t    health;

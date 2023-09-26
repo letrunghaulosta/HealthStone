@@ -11,7 +11,6 @@ struct UnitInfoType
    uint16_t    health;
    uint16_t    damage;
    uint8_t     type;
-   UnitManager::UnitType     id;
 };
 
 class UnitManager

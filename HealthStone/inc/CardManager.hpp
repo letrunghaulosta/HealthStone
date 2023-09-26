@@ -3,7 +3,7 @@
 
 #include "UnitManager.hpp"
 
-class CardManager : public UnitManager
+class CardManager
 {
 private:
    

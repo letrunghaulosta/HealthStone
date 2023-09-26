@@ -21,6 +21,7 @@ public:
    void Attack(uint8_t,uint8_t);
    void Start();
    UnitManager* GetUnitInformation(uint8_t,UnitInfoType*);
+   std::vector<uint8_t> GetHeroIdList(uint8_t player);
    // void InformEffective();
    static GameController* GetInstance(){return gcInstance;}
    uint8_t CurrentPlayerTurn(){return playerTurn;}

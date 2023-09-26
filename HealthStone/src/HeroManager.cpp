@@ -1,5 +1,7 @@
 
 #include "HeroManager.hpp"
+#include "Console.hpp"
+#include <iostream>
 #include <ctime>
 void HeroManager::Generate()
 {
@@ -20,7 +22,6 @@ void HeroManager::Generate()
 bool HeroManager::GetInformationById(uint8_t id, UnitInfoType* pUnitInfo)
 {
    auto heroInfo = heroList.find(id);
-
    if(heroInfo != heroList.end())
    {
       pUnitInfo->name = heroInfo->second->getName();
@@ -34,6 +35,7 @@ bool HeroManager::GetInformationById(uint8_t id, UnitInfoType* pUnitInfo)
 
 void HeroManager::OnAttacked(uint8_t id, uint8_t damaged)
 {
+   std::cout << "PASS CALL" << std::endl;
    auto heroInfo = heroList.find(id);
 
    if(heroInfo != heroList.end())
@@ -43,6 +45,17 @@ void HeroManager::OnAttacked(uint8_t id, uint8_t damaged)
 
    if(heroInfo->second->getHealth())
    {
-      
+
    }
 }
+
+std::vector<uint8_t> HeroManager::GetHeroIdList()
+{
+   std::vector<uint8_t> heroIdList;
+   for(auto hero : heroList)
+   {
+      heroIdList.push_back(hero.first);
+   }
+   return heroIdList;
+}
+

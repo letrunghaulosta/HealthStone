@@ -5,7 +5,10 @@ project(HealthStone)
 
 #add the executable
 add_executable(HealthStone main.cpp
-                           src/Console.cpp)
+                           src/Console.cpp
+                           src/GameController.cpp
+                           src/HeroManager.cpp
+                           src/Hero.cpp)
 
 find_package(Curses REQUIRED)
 target_include_directories(HealthStone PUBLIC
