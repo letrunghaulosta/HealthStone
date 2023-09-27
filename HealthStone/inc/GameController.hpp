@@ -16,12 +16,16 @@ class GameController
 public:
    GameController(){
       heroManager.reserve(GC_MAX_PLAYER);
+      cardManager.reserve(GC_MAX_PLAYER);
+      unitOnHand.reserve(GC_MAX_PLAYER);
    }
    ~GameController(){delete gcInstance;}
    void Attack(uint8_t,uint8_t);
+   void RemoveUnitById(uint8_t);
    void Start();
-   UnitManager* GetUnitInformation(uint8_t,UnitInfoType*);
+   UnitManager* GetUnitInformation(uint8_t, Unit::UnitInfoType*);
    std::vector<uint8_t> GetHeroIdList(uint8_t player);
+   std::vector<uint8_t> GetUnitOnHandList(uint8_t player){return unitOnHand[player];}
    // void InformEffective();
    static GameController* GetInstance(){return gcInstance;}
    uint8_t CurrentPlayerTurn(){return playerTurn;}
@@ -29,10 +33,10 @@ public:
 private:
    uint8_t playerTurn;
    uint8_t unitOntable[GC_TABLE_SIZE] = {0};
-   std::vector<std::vector<uint8_t>> unitOnHand[GC_MAX_PLAYER];
+   std::vector<std::vector<uint8_t>> unitOnHand;
    std::vector<HeroManager*> heroManager;
-   std::vector<CardManager*> cardManager[GC_MAX_PLAYER];
-   std::vector<std::vector<UnitInfoType>> bonusManager[GC_MAX_PLAYER];
+   std::vector<CardManager*> cardManager;
+   std::vector<std::vector<Unit::UnitInfoType>> bonusManager[GC_MAX_PLAYER];
    static GameController *gcInstance;
 };
 

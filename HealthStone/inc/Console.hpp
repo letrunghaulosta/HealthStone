@@ -30,6 +30,7 @@ public:
    void SetSelect(ConsoleSelectedType s){selected = s;}
    ConsoleSelectedType GetSelected(){return selected;}
    bool IsExit(){return isExit;}
+   void SetExit(){isExit = true;}
 private:
    ConsoleSelectedType selected;
    bool isExit;

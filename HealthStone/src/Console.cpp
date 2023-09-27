@@ -1,8 +1,27 @@
 #include "Console.hpp"
 #include "GameController.hpp"
 #include <iostream>
+#include <unistd.h>
+#include <map>
+
+#define DUMP_INFO(i,n,h,d,t)  do                                     \
+                              {                                      \
+                                 cout << "ID: " << i << "\t";        \
+                                 cout << "Name: ";cout.width(20);cout << left << n << "\t";\
+                                 cout << "Health: " << h << "\t";    \
+                                 cout << "Damage: " << d << "\t";    \
+                                 cout << "Type: " << t << endl;      \
+                              }while(0)
 
 using namespace std;
+
+const std::map<Unit::UnitType, std::string> UnitTypeToStrMapping =
+{
+   {Unit::UNIT_TYPE_HERO, "HERO"},
+   {Unit::UNIT_TYPE_MINION, "MINION"},
+   {Unit::UNIT_TYPE_SHAMAN, "SHAMAN"},
+   {Unit::UNIT_TYPE_SPELL, "SPELL"}
+};
 
 void Console::OnStart()
 {
@@ -18,23 +37,51 @@ void Console::OnLoading()
    system("clear");
    cout << "===========On Running============" << endl;
    GameController::GetInstance()->Start();
-   cout << "Press enter to continue..." << endl;
+   cout << "Press enter to continue..." << endl << endl;
    cin.ignore();
+   system("clear");
+   system("clear");
+
+   auto heroIdList = GameController::GetInstance()->GetHeroIdList((uint8_t)GC_PLAYER_1);
+   for(auto heroId : heroIdList)
+   {
+      Unit::UnitInfoType unitInfo;
+      GameController::GetInstance()->GetUnitInformation(heroId, &unitInfo);
+      DUMP_INFO((int)heroId,
+                unitInfo.name,
+                unitInfo.health,
+                unitInfo.damage,
+                UnitTypeToStrMapping.at(unitInfo.type));
+   }
+   cout << "==============================\n";
+   cout << "||                          ||\n";
+   cout << "==============================\n";
+   heroIdList = GameController::GetInstance()->GetHeroIdList((uint8_t)GC_PLAYER_2);
+   for(auto heroId : heroIdList)
+   {
+      Unit::UnitInfoType unitInfo;
+      GameController::GetInstance()->GetUnitInformation(heroId, &unitInfo);
+      DUMP_INFO((int)heroId,
+                unitInfo.name,
+                unitInfo.health,
+                unitInfo.damage,
+                UnitTypeToStrMapping.at(unitInfo.type));
+   }
    SetSelect(ConsoleNext);
 }
 
 void Console::OnPlay(int8_t player)
 {
-   system("clear");
-   cout << "===========PLAYER " << player + 1 << " TURN============\n";
-   for(auto heroId : GameController::GetInstance()->GetHeroIdList((uint8_t)player))
+   cout << "===========PLAYER " << player + 1 << " TURN============\n";   
+   for(auto unitId : GameController::GetInstance()->GetUnitOnHandList((uint8_t)player))
    {
-      UnitInfoType unitInfo;
-      GameController::GetInstance()->GetUnitInformation(heroId, &unitInfo);
-      cout << "ID: " << (int)heroId << endl;
-      cout << "Name:   " << unitInfo.name << endl;
-      cout << "Health: " << unitInfo.health << endl;
-      cout << "Damage: " << unitInfo.damage << endl;
+      Unit::UnitInfoType unitInfo;
+      GameController::GetInstance()->GetUnitInformation(unitId, &unitInfo);
+      DUMP_INFO((int)unitId,
+                unitInfo.name,
+                unitInfo.health,
+                unitInfo.damage,
+                UnitTypeToStrMapping.at(unitInfo.type));
    }
    cout << "Press enter to continue..." << endl;
    cin.ignore();
@@ -43,11 +90,52 @@ void Console::OnPlay(int8_t player)
 void Console::OnProcess()
 {
    system("clear");
-   cout << "===========On Process============\n";
 
-   cout << "Press enter to continue..." << endl;
-   cin.ignore();
+   auto heroIdList = GameController::GetInstance()->GetHeroIdList((uint8_t)GC_PLAYER_1);
+   if(heroIdList.size() == 0)
+   {
+      cout << "PLAYER 2 WIN" << endl;
+      SetExit();
+   }
+   else
+   {
+      for(auto heroId : heroIdList)
+      {
+         Unit::UnitInfoType unitInfo;
+         GameController::GetInstance()->GetUnitInformation(heroId, &unitInfo);
+         DUMP_INFO((int)heroId,
+                  unitInfo.name,
+                  unitInfo.health,
+                  unitInfo.damage,
+                  UnitTypeToStrMapping.at(unitInfo.type));
+      }
+   }
+
+   cout << "==============================\n";
+   cout << "||                          ||\n";
+   cout << "==============================\n";
+
+   heroIdList = GameController::GetInstance()->GetHeroIdList((uint8_t)GC_PLAYER_2);
+   if(heroIdList.size() == 0)
+   {
+      cout << "PLAYER 1 WIN" << endl;
+      SetExit();
+   }
+   else
+   {
+      for(auto heroId : heroIdList)
+      {
+         Unit::UnitInfoType unitInfo;
+         GameController::GetInstance()->GetUnitInformation(heroId, &unitInfo);
+         DUMP_INFO((int)heroId,
+                  unitInfo.name,
+                  unitInfo.health,
+                  unitInfo.damage,
+                  UnitTypeToStrMapping.at(unitInfo.type));
+      }
+   }
    SetSelect(ConsoleNext);
+   usleep(500000);
 }
 
 void Console::OnEnd()
@@ -132,8 +220,8 @@ void ConsoleState_OnPlayer1Turn::entry(ConsoleStateMachine &sm)
 {
    sm.getActionInstance()->SetSelect(Console::ConsoleNotSet);
    sm.getActionInstance()->OnPlay(GC_PLAYER_1);
-   std::cout << "PASS CALL SEELCT" << std::endl;
-   GameController::GetInstance()->Attack(0,1);
+
+   GameController::GetInstance()->Attack(1,2);
 }
 void ConsoleState_OnPlayer1Turn::next(ConsoleStateMachine &sm)
 {
@@ -151,6 +239,8 @@ void ConsoleState_OnPlayer2Turn::entry(ConsoleStateMachine &sm)
 {
    sm.getActionInstance()->SetSelect(Console::ConsoleNotSet);
    sm.getActionInstance()->OnPlay(GC_PLAYER_2);
+
+   GameController::GetInstance()->Attack(2,1);
 }
 void ConsoleState_OnPlayer2Turn::next(ConsoleStateMachine &sm)
 {
