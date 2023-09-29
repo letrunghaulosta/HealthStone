@@ -47,9 +47,9 @@ void HeroManager::OnAttacked(uint8_t id, uint8_t damaged, UM_OnDestroy_Callback 
    }
 }
 
-std::vector<uint8_t> HeroManager::GetHeroIdList()
+std::list<uint8_t> HeroManager::GetIdList()
 {
-   std::vector<uint8_t> heroIdList;
+   std::list<uint8_t> heroIdList;
    for(auto hero : heroList)
    {
       heroIdList.push_back(hero.first);

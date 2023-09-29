@@ -24,7 +24,8 @@ public:
    ~Console(){};
    void OnStart(void);
    void OnLoading(void);
-   void OnPlay(int8_t);
+   void OnPlayerMove(uint8_t);
+   void AfterPlayerMove(uint8_t);
    void OnProcess();
    void OnEnd(void);
    void SetSelect(ConsoleSelectedType s){selected = s;}

@@ -4,7 +4,7 @@
 #include "UnitManager.hpp"
 #include "Hero.hpp"
 #include "map"
-#include <vector>
+#include <list>
 
 class HeroManager : public UnitManager
 {
@@ -23,7 +23,7 @@ public:
    bool GetInformationById(uint8_t, Unit::UnitInfoType*);
    void DestroyById(uint8_t);
    void Attack(uint8_t){};
-   std::vector<uint8_t> GetHeroIdList();
+   std::list<uint8_t> GetIdList();
 private:
    std::map<uint8_t,Hero*> heroList;
 };

@@ -27,9 +27,24 @@ void CardManager::Generate()
    }
 }
 
-std::vector<uint8_t> CardManager::GetCardIdList()
+void CardManager::OnAttacked(uint8_t id, uint8_t damaged, UM_OnDestroy_Callback pfuncCbk)
 {
-   std::vector<uint8_t> cardIdList;
+   auto cardInfo = cardList.find(id);
+   if(cardInfo != cardList.end())
+   {
+      cardInfo->second->OnAttacked(damaged);
+   }
+
+   if(0 == cardInfo->second->getHealth())
+   {
+      cardInfo->second->ActiveDestroyEffect(id);
+      pfuncCbk(id);
+   }
+}
+
+std::list<uint8_t> CardManager::GetIdList()
+{
+   std::list<uint8_t> cardIdList;
    for(auto card : cardList)
    {
       cardIdList.push_back(card.first);
@@ -49,4 +64,23 @@ bool CardManager::GetInformationById(uint8_t id, Unit::UnitInfoType* pUnitInfo)
       return true;
    }
    return false;
+}
+
+void CardManager::DestroyById(uint8_t id)
+{
+   auto cardInfo = cardList.find(id);
+
+   if(cardInfo == cardList.end())
+   {
+      return;
+   }
+
+   EraseID(id);
+   cardList.erase(cardInfo);
+}
+
+void CardManager::ActivateRunTimeEffect(uint8_t id)
+{
+   auto cardInfo = cardList.find(id);
+   cardInfo->second->ActiveRunTimeEffect(id);
 }

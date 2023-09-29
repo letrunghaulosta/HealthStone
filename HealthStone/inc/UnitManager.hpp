@@ -5,6 +5,7 @@
 #include <string>
 #include <cstdlib>
 #include <vector>
+#include <list>
 #include <functional>
 
 typedef std::function<void(int)> UM_OnDestroy_Callback;
@@ -16,6 +17,8 @@ public:
    virtual void OnAttacked(uint8_t, uint8_t, UM_OnDestroy_Callback) = 0;
    virtual bool GetInformationById(uint8_t, Unit::UnitInfoType*) = 0;
    virtual void Attack(uint8_t) = 0;
+   virtual std::list<uint8_t> GetIdList() = 0;
+
    uint8_t AllocateID() {
       for(auto it = unitIdContainer.begin(); it != unitIdContainer.end();it++)
       {

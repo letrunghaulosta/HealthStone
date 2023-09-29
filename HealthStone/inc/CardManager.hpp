@@ -3,8 +3,8 @@
 
 #include "UnitManager.hpp"
 #include "Card.hpp"
-#include "map"
-#include <vector>
+#include <map>
+#include <list>
 
 class CardManager : public UnitManager
 {
@@ -19,11 +19,12 @@ public:
       }
    }
    void Generate(void);
-   void OnAttacked(uint8_t, uint8_t,UM_OnDestroy_Callback){};
+   void OnAttacked(uint8_t, uint8_t,UM_OnDestroy_Callback);
    bool GetInformationById(uint8_t, Unit::UnitInfoType*);
-   void DestroyById(uint8_t){};
+   void DestroyById(uint8_t);
    void Attack(uint8_t){};
-   std::vector<uint8_t> GetCardIdList();
+   void ActivateRunTimeEffect(uint8_t);
+   std::list<uint8_t> GetIdList();
 private:
    std::map<uint8_t,Card*> cardList;
 };

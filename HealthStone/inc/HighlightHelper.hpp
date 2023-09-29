@@ -32,7 +32,7 @@ public:
 
    int stream()
    {
-        int c = 0;    
+        int c = 0;
         initscr();
         raw();
         keypad(stdscr, true);
