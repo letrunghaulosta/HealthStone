@@ -46,7 +46,24 @@ void Console::OnStart()
 {
    system("clear");
    cout << "===========HEALTH STONE============\n";
-   cout << "Press enter to continue...\n";
+   cout << "1. Play Offline\n";
+   cout << "2. Play Online(Host)\n";
+   cout << "3. Play Online(Client)\n";
+   int select;
+   do
+   {
+      cin >> select;
+      if(!cin || ((select != 1) && (select != 2) && (select != 3)))
+      {
+         cin.clear();
+         cin.ignore(std::numeric_limits<std::streamsize>::max(),'\n');
+         cout << "Invalid CMD, please correct select" << endl;
+      }
+      else
+      {
+         GameController::GetInstance()->SetGameType((GameController::GamePlayType)select);
+      }
+   }while(GameController::GetInstance()->GetGamePlayType() == GameController::GameTypeNotSet);
    cin.ignore();
    SetSelect(ConsoleNext);
 }
@@ -56,7 +73,7 @@ void Console::OnLoading()
    system("clear");
    cout << "===========On Running============" << endl;
    GameController::GetInstance()->Start();
-   cout << "Press enter to continue..." << endl << endl;
+   cout << "Press enter to continue...";
    cin.ignore();
    system("clear");
 
@@ -239,13 +256,78 @@ void ConsoleState_StartUp::entry(ConsoleStateMachine &sm)
 }
 void ConsoleState_StartUp::next(ConsoleStateMachine &sm)
 {
-   setState(sm, new ConsoleState_OnRunning());
+   if(GameController::GetInstance()->GetGamePlayType() == GameController::GameTypeOffline)
+   {
+      setState(sm, new ConsoleState_OnRunning());
+   }
+   else
+   {
+      setState(sm, new ConsoleState_SetupConnection());
+   }
 }
 void ConsoleState_StartUp::back(ConsoleStateMachine &sm)
 {
    return;
 }
 void ConsoleState_StartUp::select(ConsoleStateMachine &sm, uint8_t option)
+{
+   return;
+}
+/***ConsoleState_SetupConnection**/
+void ConsoleState_SetupConnection::entry(ConsoleStateMachine &sm)
+{
+   sm.getActionInstance()->SetSelect(Console::ConsoleNext);
+}
+void ConsoleState_SetupConnection::next(ConsoleStateMachine &sm)
+{
+   if(GameController::GetInstance()->GetGamePlayType() == GameController::GamgeTypeHost)
+   {
+      setState(sm, new ConsoleState_HostSetup());
+   }
+   else
+   {
+      setState(sm, new ConsoleState_ClientSetup());
+   }
+}
+void ConsoleState_SetupConnection::back(ConsoleStateMachine &sm)
+{
+   return;
+}
+void ConsoleState_SetupConnection::select(ConsoleStateMachine &sm, uint8_t option)
+{
+   return;
+}
+/***ConsoleState_HostSetup**/
+void ConsoleState_HostSetup::entry(ConsoleStateMachine &sm)
+{
+   sm.getActionInstance()->SetSelect(Console::ConsoleNotSet);
+}
+void ConsoleState_HostSetup::next(ConsoleStateMachine &sm)
+{
+   return;
+}
+void ConsoleState_HostSetup::back(ConsoleStateMachine &sm)
+{
+   return;
+}
+void ConsoleState_HostSetup::select(ConsoleStateMachine &sm, uint8_t option)
+{
+   return;
+}
+/***ConsoleState_ClientSetup**/
+void ConsoleState_ClientSetup::entry(ConsoleStateMachine &sm)
+{
+   sm.getActionInstance()->SetSelect(Console::ConsoleNotSet);
+}
+void ConsoleState_ClientSetup::next(ConsoleStateMachine &sm)
+{
+   return;
+}
+void ConsoleState_ClientSetup::back(ConsoleStateMachine &sm)
+{
+   return;
+}
+void ConsoleState_ClientSetup::select(ConsoleStateMachine &sm, uint8_t option)
 {
    return;
 }

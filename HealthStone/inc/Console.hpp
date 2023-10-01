@@ -11,7 +11,7 @@ public:
 
    enum ConsoleSelectedType
    {
-      ConsoleNotSet,
+      ConsoleNotSet = 0,
       ConsoleNext,
       ConsoleBack,
       ConsoleSelect
@@ -32,9 +32,11 @@ public:
    ConsoleSelectedType GetSelected(){return selected;}
    bool IsExit(){return isExit;}
    void SetExit(){isExit = true;}
+
 private:
    ConsoleSelectedType selected;
    bool isExit;
+
 };
 
 class ConsoleState
@@ -60,6 +62,33 @@ protected:
 };
 
 class ConsoleState_StartUp : public ConsoleState_Root
+{
+public:
+   virtual void entry(ConsoleStateMachine &sm);
+   virtual void next(ConsoleStateMachine &sm);
+   virtual void back(ConsoleStateMachine &sm);
+   virtual void select(ConsoleStateMachine &sm, uint8_t option);
+};
+
+class ConsoleState_SetupConnection : public ConsoleState_Root
+{
+public:
+   virtual void entry(ConsoleStateMachine &sm);
+   virtual void next(ConsoleStateMachine &sm);
+   virtual void back(ConsoleStateMachine &sm);
+   virtual void select(ConsoleStateMachine &sm, uint8_t option);
+};
+
+class ConsoleState_HostSetup : public ConsoleState_SetupConnection
+{
+public:
+   virtual void entry(ConsoleStateMachine &sm);
+   virtual void next(ConsoleStateMachine &sm);
+   virtual void back(ConsoleStateMachine &sm);
+   virtual void select(ConsoleStateMachine &sm, uint8_t option);
+};
+
+class ConsoleState_ClientSetup : public ConsoleState_SetupConnection
 {
 public:
    virtual void entry(ConsoleStateMachine &sm);

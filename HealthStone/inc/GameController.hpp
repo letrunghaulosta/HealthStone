@@ -24,6 +24,15 @@ public:
       int16_t damage;
       int16_t health;
    };
+
+   enum GamePlayType
+   {
+      GameTypeNotSet = 0,
+      GameTypeOffline,
+      GamgeTypeHost,
+      GameTypeClient
+   };
+
    GameController(){
       heroManager.resize(GC_MAX_PLAYER);
       cardManager.resize(GC_MAX_PLAYER);
@@ -31,6 +40,7 @@ public:
       unitOnTable.resize(GC_MAX_PLAYER);
       bonusManager.resize(GC_MAX_PLAYER);
       currentRound = 0;
+      gameType = GameTypeNotSet;
    }
    ~GameController(){delete gcInstance;}
    void Attack(uint8_t,uint8_t);
@@ -48,12 +58,15 @@ public:
 
    static GameController* GetInstance(){return gcInstance;}
 
+   GamePlayType GetGamePlayType(){return gameType;}
    uint8_t GetPlayerByUnitId(uint8_t id);
    uint8_t CurrentPlayerTurn(){return playerTurn;}
    void ChangePlayerTurn(){playerTurn ^= 1;};
    int GetCurrentRound(){return currentRound;}
    void IncreaseRound(){currentRound++;};
+   void SetGameType(GamePlayType t){gameType = t;}
 private:
+   GamePlayType gameType;
    int currentRound;
    uint8_t playerTurn;
    std::vector<std::list<uint8_t>> unitOnTable;
