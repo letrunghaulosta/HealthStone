@@ -4,7 +4,7 @@
 #include <iostream>
 #include <unistd.h>
 #include <string.h>
-
+#include <list>
 
 #define PORT 8080
 
@@ -108,6 +108,17 @@ void Socket::Send(SockMessage* message, int _size)
     for(int i=0;i<_size-4;i++)
     std::cout << (int)message->buffer[i] << " ";
     std::cout << std::endl;
+}
+
+void Socket::CopyData(std::list<uint8_t> src, uint8_t* dest, uint16_t* size)
+{
+    uint8_t _size = 0;
+    for(auto d : src)
+    {
+        dest[_size] = d;
+        _size++;
+    }
+    *size = _size + 4;
 }
 
 void Socket::Close()

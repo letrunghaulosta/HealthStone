@@ -6,6 +6,7 @@
 #include <map>
 #include <list>
 #include <algorithm>
+#include <string.h>
 
 #define DUMP_UNIT_INFO(i,n,h,bh,d,bd,t)  do                                     \
                                  {                                      \
@@ -75,7 +76,7 @@ void Console::OnHost()
    cout << "===========On Host============" << endl;
    Socket::GetInstance()->CreateSocket();
    cout << "CONNECT SUCCESS" << endl;
-   sleep(3);
+   sleep(1);
    SetSelect(ConsoleNext);
 }
 
@@ -85,7 +86,7 @@ void Console::OnClient()
    cout << "===========On Client============" << endl;
    Socket::GetInstance()->Connect();
    cout << "CONNECT SUCCESS" << endl;
-   sleep(3);
+   sleep(1);
    SetSelect(ConsoleNext);
 }
 
@@ -98,33 +99,40 @@ void Console::OnLoading()
    cin.ignore();
    system("clear");
 
-   auto heroIdList = GameController::GetInstance()->GetHeroIdList((uint8_t)GC_PLAYER_1);
-   DUMP_UNIT_LIST_INFO(heroIdList,GC_PLAYER_1);
+   auto heroIdList_p1 = GameController::GetInstance()->GetHeroIdList((uint8_t)GC_PLAYER_1);
+   DUMP_UNIT_LIST_INFO(heroIdList_p1,GC_PLAYER_1);
    cout << "====================================================================\n";
    cout << "||                                                                ||\n";
    cout << "====================================================================\n";
-   heroIdList = GameController::GetInstance()->GetHeroIdList((uint8_t)GC_PLAYER_2);
-   DUMP_UNIT_LIST_INFO(heroIdList,GC_PLAYER_2);
+   auto heroIdList_p2 = GameController::GetInstance()->GetHeroIdList((uint8_t)GC_PLAYER_2);
+   DUMP_UNIT_LIST_INFO(heroIdList_p2,GC_PLAYER_2);
    if(GameController::GamgeTypeHost == GameController::GetInstance()->GetGamePlayType())
    {
-      cout << "PASS HERE\n";
       Socket::SockMessage sockMessage;
-      sockMessage.messageType = Socket::MESSAGE_LENGTH;
-      sockMessage.size = 0;
-      for(auto id : heroIdList)
-      {
-         sockMessage.buffer[sockMessage.size] = id;
-         sockMessage.size++;
-      }
-      sockMessage.size += 4;
+      // sockMessage.messageType = Socket::MESSAGE_LENGTH;
+      // sockMessage.size = 0;
+      // for(auto id : heroIdList_p1)
+      // {
+      //    sockMessage.buffer[sockMessage.size] = id;
+      //    sockMessage.size++;
+      // }
+      // sockMessage.size += 4;
       // Inform to client ready to send data
+      // Socket::GetInstance()->Send(&sockMessage, 4);
+      
+      // Socket::SockMessage sockAck;
+      // sockAck.messageType = Socket::ACK_KNOWLEDGE;
+      // Socket::GetInstance()->Receive(&sockAck, 4);
+      sockMessage.messageType = Socket::MESSAGE_LENGTH;
+      Socket::GetInstance()->CopyData(heroIdList_p1,sockMessage.buffer,&sockMessage.size);
       Socket::GetInstance()->Send(&sockMessage, 4);
-      
-      Socket::SockMessage sockAck;
-      sockAck.messageType = Socket::ACK_KNOWLEDGE;
-      Socket::GetInstance()->Receive(&sockAck, 4);
-      
-      sockMessage.messageType = Socket::HERO_LIST_ID;
+      sockMessage.messageType = Socket::HERO_LIST_ID_P1;
+      Socket::GetInstance()->Send(&sockMessage, sockMessage.size);
+
+      sockMessage.messageType = Socket::MESSAGE_LENGTH;
+      Socket::GetInstance()->CopyData(heroIdList_p2,sockMessage.buffer,&sockMessage.size);
+      Socket::GetInstance()->Send(&sockMessage, 4);
+      sockMessage.messageType = Socket::HERO_LIST_ID_P2;
       Socket::GetInstance()->Send(&sockMessage, sockMessage.size);
    }
    SetSelect(ConsoleNext);
@@ -137,32 +145,88 @@ void Console::OnClientLoading()
 
    Socket::SockMessage sockMessage;
    Socket::GetInstance()->Receive(&sockMessage, 4);
-   
-   Socket::SockMessage sockAck;
-   sockAck.messageType = Socket::ACK_KNOWLEDGE;
-   sockAck.size = sizeof(Socket::SockMessage);
-   Socket::GetInstance()->Send(&sockAck, 4);
-
    Socket::GetInstance()->Receive(&sockMessage, sockMessage.size);
-
-   list<uint8_t> heroIdList;
-
-   for(int i =0 ; i < sockMessage.size-4;i++)
+   list<uint8_t> heroIdList_p1;
+   uint16_t size = sockMessage.size - 4;
+   while(size)
    {
-      heroIdList.push_back(sockMessage.buffer[i]);
+      heroIdList_p1.push_front(sockMessage.buffer[--size]);
    }
 
-   for(auto id : heroIdList)
+   for(auto id : heroIdList_p1)
    {
-      cout << (int)id << endl;
-   }  
+      cout << "ID1: " << (int)id << " ";
+   }
 
+   Socket::GetInstance()->Receive(&sockMessage, 4);
+   Socket::GetInstance()->Receive(&sockMessage, sockMessage.size);
+   list<uint8_t> heroIdList_p2;
+   size = sockMessage.size - 4;
+   while(size)
+   {
+      heroIdList_p2.push_front(sockMessage.buffer[--size]);
+   }
+   for(auto id : heroIdList_p2)
+   {
+      cout << "ID2: " << (int)id << " ";
+   }
+   cout << endl;
    SetSelect(ConsoleNext);
 }
 
 void Console::OnPlayerMove(uint8_t player)
 {
-   cout << "==================     PLAYER " << player + 1 << " TURN     =================\n\n";
+   cout << "==================     PLAYER " << player + 1 << " TURN     =================" << endl;;
+   if(GameController::GetInstance()->GetGamePlayType() == GameController::GamgeTypeHost)
+   {
+      if(player == GC_PLAYER_2)
+      {
+         cout << "Waiting to player 2" << endl;
+         Socket::SockMessage sockMessage;
+         while(sockMessage.messageType != Socket::DONE_MESSAGE)
+         {
+            Socket::GetInstance()->Receive(&sockMessage, sizeof(Socket::SockMessage));
+            switch(sockMessage.messageType)
+            {
+               case Socket::CLIENT_REQUEST_ATTACK:
+               break;
+               case Socket::CLIENT_REQUEST_UNIT_INFO:
+               {   
+                  Unit::UnitInfoType unitInfo;
+                  GameController::GetInstance()->GetUnitInformation(sockMessage.buffer[0], &unitInfo);
+                  sockMessage.messageType = Socket::RESPOND_UNIT_INFO;
+                  // Socket::GetInstance()->CopyData(&unitInfo,sizeof(unitInfo),&sockMessage.buffer,&sockMessage.size);
+                  Socket::GetInstance()->Send(&sockMessage, sockMessage.size);
+               }   
+               break;
+               case Socket::CLIENT_PLACE_CARD:
+                  GameController::GetInstance()->PlaceToBattle(GC_PLAYER_2, sockMessage.buffer[0]);
+               break;
+            }
+         }
+         SetSelect(ConsoleNext);
+         return;
+      }
+   }
+   else if(GameController::GetInstance()->GetGamePlayType() == GameController::GameTypeClient)
+   {
+      if(player == GC_PLAYER_1)
+      {
+         cout << "Waiting to player 1" << endl;;
+         Socket::SockMessage sockMessage;
+         while(sockMessage.messageType != Socket::DONE_MESSAGE)
+         {
+            Socket::GetInstance()->Receive(&sockMessage, 4);
+         }
+      }
+      else
+      {
+         Socket::SockMessage sockMessage;
+      }
+      // SetSelect(ConsoleNext);
+      return;
+   }
+
    list<uint8_t> unitOnHandList = GameController::GetInstance()->GetUnitOnHandIdList(player);
    if(0 == unitOnHandList.size())
    {
@@ -203,7 +267,20 @@ void Console::OnPlayerMove(uint8_t player)
       } while(confirm != 'y' && confirm != 'Y');
       GameController::GetInstance()->PlaceToBattle(player, (int)select);
    }
+   
+   if(GameController::GetInstance()->GetGamePlayType() == GameController::GamgeTypeHost)
+   {
+      Socket::SockMessage sockMessage;
+      sockMessage.messageType = Socket::DONE_MESSAGE;
+      Socket::GetInstance()->Send(&sockMessage, 4);
+   }
+
    SetSelect(ConsoleNext);
+}
+
+void Console::OnClientMove()
+{
+
 }
 
 void Console::AfterPlayerMove(uint8_t player)

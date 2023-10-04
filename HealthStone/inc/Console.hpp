@@ -26,8 +26,11 @@ public:
    void OnLoading(void);
    void OnClientLoading(void);
    void OnPlayerMove(uint8_t);
+   void OnClientMove();
    void AfterPlayerMove(uint8_t);
+   void AfterClientMove();
    void OnProcess();
+   void OnClientProcess();
    void OnEnd(void);
    void OnHost(void);
    void OnClient(void);
