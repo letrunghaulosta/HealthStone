@@ -1,5 +1,6 @@
 #include "Console.hpp"
 #include "GameController.hpp"
+#include "Socket.hpp"
 #include <iostream>
 #include <unistd.h>
 #include <map>
@@ -68,6 +69,26 @@ void Console::OnStart()
    SetSelect(ConsoleNext);
 }
 
+void Console::OnHost()
+{
+   system("clear");
+   cout << "===========On Host============" << endl;
+   Socket::GetInstance()->CreateSocket();
+   cout << "CONNECT SUCCESS" << endl;
+   sleep(3);
+   SetSelect(ConsoleNext);
+}
+
+void Console::OnClient()
+{
+   system("clear");
+   cout << "===========On Client============" << endl;
+   Socket::GetInstance()->Connect();
+   cout << "CONNECT SUCCESS" << endl;
+   sleep(3);
+   SetSelect(ConsoleNext);
+}
+
 void Console::OnLoading()
 {
    system("clear");
@@ -84,6 +105,57 @@ void Console::OnLoading()
    cout << "====================================================================\n";
    heroIdList = GameController::GetInstance()->GetHeroIdList((uint8_t)GC_PLAYER_2);
    DUMP_UNIT_LIST_INFO(heroIdList,GC_PLAYER_2);
+   if(GameController::GamgeTypeHost == GameController::GetInstance()->GetGamePlayType())
+   {
+      cout << "PASS HERE\n";
+      Socket::SockMessage sockMessage;
+      sockMessage.messageType = Socket::MESSAGE_LENGTH;
+      sockMessage.size = 0;
+      for(auto id : heroIdList)
+      {
+         sockMessage.buffer[sockMessage.size] = id;
+         sockMessage.size++;
+      }
+      sockMessage.size += 4;
+      // Inform to client ready to send data
+      Socket::GetInstance()->Send(&sockMessage, 4);
+      
+      Socket::SockMessage sockAck;
+      sockAck.messageType = Socket::ACK_KNOWLEDGE;
+      Socket::GetInstance()->Receive(&sockAck, 4);
+      
+      sockMessage.messageType = Socket::HERO_LIST_ID;
+      Socket::GetInstance()->Send(&sockMessage, sockMessage.size);
+   }
+   SetSelect(ConsoleNext);
+}
+
+void Console::OnClientLoading()
+{
+   system("clear");
+   cout << "===========On Running============" << endl;
+
+   Socket::SockMessage sockMessage;
+   Socket::GetInstance()->Receive(&sockMessage, 4);
+   
+   Socket::SockMessage sockAck;
+   sockAck.messageType = Socket::ACK_KNOWLEDGE;
+   sockAck.size = sizeof(Socket::SockMessage);
+   Socket::GetInstance()->Send(&sockAck, 4);
+
+   Socket::GetInstance()->Receive(&sockMessage, sockMessage.size);
+
+   list<uint8_t> heroIdList;
+
+   for(int i =0 ; i < sockMessage.size-4;i++)
+   {
+      heroIdList.push_back(sockMessage.buffer[i]);
+   }
+
+   for(auto id : heroIdList)
+   {
+      cout << (int)id << endl;
+   }  
 
    SetSelect(ConsoleNext);
 }
@@ -301,10 +373,11 @@ void ConsoleState_SetupConnection::select(ConsoleStateMachine &sm, uint8_t optio
 void ConsoleState_HostSetup::entry(ConsoleStateMachine &sm)
 {
    sm.getActionInstance()->SetSelect(Console::ConsoleNotSet);
+   sm.getActionInstance()->OnHost();
 }
 void ConsoleState_HostSetup::next(ConsoleStateMachine &sm)
 {
-   return;
+   setState(sm, new ConsoleState_OnRunning());
 }
 void ConsoleState_HostSetup::back(ConsoleStateMachine &sm)
 {
@@ -318,10 +391,11 @@ void ConsoleState_HostSetup::select(ConsoleStateMachine &sm, uint8_t option)
 void ConsoleState_ClientSetup::entry(ConsoleStateMachine &sm)
 {
    sm.getActionInstance()->SetSelect(Console::ConsoleNotSet);
+   sm.getActionInstance()->OnClient();
 }
 void ConsoleState_ClientSetup::next(ConsoleStateMachine &sm)
 {
-   return;
+   setState(sm, new ConsoleState_OnRunning());
 }
 void ConsoleState_ClientSetup::back(ConsoleStateMachine &sm)
 {
@@ -335,7 +409,14 @@ void ConsoleState_ClientSetup::select(ConsoleStateMachine &sm, uint8_t option)
 void ConsoleState_OnRunning::entry(ConsoleStateMachine &sm)
 {
    sm.getActionInstance()->SetSelect(Console::ConsoleNotSet);
-   sm.getActionInstance()->OnLoading();
+   if(GameController::GameTypeClient == GameController::GetInstance()->GetGamePlayType())
+   {
+      sm.getActionInstance()->OnClientLoading();
+   }
+   else
+   {
+      sm.getActionInstance()->OnLoading();
+   }
 }
 void ConsoleState_OnRunning::next(ConsoleStateMachine &sm)
 {

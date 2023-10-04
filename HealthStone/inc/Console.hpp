@@ -24,10 +24,13 @@ public:
    ~Console(){};
    void OnStart(void);
    void OnLoading(void);
+   void OnClientLoading(void);
    void OnPlayerMove(uint8_t);
    void AfterPlayerMove(uint8_t);
    void OnProcess();
    void OnEnd(void);
+   void OnHost(void);
+   void OnClient(void);
    void SetSelect(ConsoleSelectedType s){selected = s;}
    ConsoleSelectedType GetSelected(){return selected;}
    bool IsExit(){return isExit;}

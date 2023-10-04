@@ -4,7 +4,7 @@ PROJECT_BIN_DIR=$PROJECT_SOURCE_DIR/generated
 TOOLCHAIN_DIR=$PROJECT_SOURCE_DIR/build
 GENRATOR="Unix Makefiles"
 LOGFILE=$PROJECT_SOURCE_DIR/build/build.log
-
+LOGFILECLIENT=$PROJECT_SOURCE_DIR/build/buildClient.log
 # Function definition
 preCreate()
 {
@@ -39,6 +39,13 @@ run()
     ./generated/HealthStone #TODO
 }
 
+runClient()
+{
+    cp ./generated/HealthStone ./generated/HealthStoneClient
+    clear
+    ./generated/HealthStoneClient
+}
+
 help()
 {
     echo -e "Usage of $0"
@@ -51,6 +58,7 @@ help()
 # clean variables
 unset _CLEAN
 unset _RUN
+unset _CLIENT
 unset _HELP
 
 # Parse input
@@ -68,6 +76,10 @@ do
             ;;
         --run )
             _RUN=true
+            shift
+            ;;
+        --client )
+            _CLIENT=true
             shift
             ;;
         * )
@@ -90,7 +102,11 @@ if [ "${_CLEAN}" == "true" ]; then
     exit 0
 fi
 if [ "${_RUN}" == "true" ]; then
-    run
+    (run)2>&1 | tee $LOGFILE
+    exit 0
+fi
+if [ "${_CLIENT}" == "true" ]; then
+    (runClient)2>&1 | tee $LOGFILECLIENT
     exit 0
 fi
 (
