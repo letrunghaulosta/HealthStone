@@ -29,7 +29,7 @@ public:
    {
       GameTypeNotSet = 0,
       GameTypeOffline,
-      GamgeTypeHost,
+      GameTypeHost,
       GameTypeClient
    };
 

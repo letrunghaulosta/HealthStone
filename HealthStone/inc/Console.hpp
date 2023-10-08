@@ -30,6 +30,7 @@ public:
    void AfterPlayerMove(uint8_t);
    void AfterClientMove();
    void OnProcess();
+   void OnHostProcess();
    void OnClientProcess();
    void OnEnd(void);
    void OnHost(void);

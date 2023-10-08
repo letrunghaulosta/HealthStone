@@ -8,13 +8,15 @@
 class Socket
 {
 public:
-    enum GameMessageType : uint16_t
+    enum GameMessageType : uint8_t
     {
         HERO_LIST_ID_P1 = 1,
         HERO_LIST_ID_P2,
+        CARD_ON_HAND_LIST_ID_P1,
+        CARD_ON_HAND_LIST_ID_P2,
+        CARD_ON_TABLE_LIST_ID_P1,
+        CARD_ON_TABLE_LIST_ID_P2,
         CLIENT_REQUEST_UNIT_INFO,
-        CLIENT_REQUEST_ATTACK,
-        RESPOND_UNIT_INFO,
         INFORM_WINNER,
         DONE_MESSAGE,
         MESSAGE_LENGTH,
@@ -25,8 +27,7 @@ public:
     struct SockMessage
     {
         GameMessageType messageType;
-        uint16_t size;
-        uint8_t buffer[1020];
+        uint8_t buffer[254];
     };
 
     Socket(){
@@ -39,9 +40,8 @@ public:
     }
     void CreateSocket();
     void Connect();
-    void CopyData(std::list<uint8_t> src, uint8_t* dest, uint16_t* size);
-    void Receive(SockMessage*, int);
-    void Send(SockMessage*,int);
+    void Receive(SockMessage*, uint8_t*);
+    void Send(SockMessage*,uint8_t);
     void Close();
     static Socket* GetInstance(){return socketInstance;}
 private:

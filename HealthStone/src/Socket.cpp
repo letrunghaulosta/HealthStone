@@ -84,41 +84,35 @@ void Socket::Connect()
     }
 }
 
-void Socket::Receive(SockMessage* message, int _size)
+void Socket::Receive(SockMessage* message, uint8_t* length)
 {
     int new_sock = client_fd < 0?socket_fd:client_fd;
-    read(new_sock, message, _size);
-    std::cout << "RECEIVE:\n";
-    std::cout << "Type: " << message->messageType << std::endl;
-    std::cout << "Size: " << _size << std::endl;
-    std::cout << "Buff: "; 
-    for(int i=0;i<_size-4;i++)
-    std::cout << (int)message->buffer[i] << " ";
-    std::cout << std::endl;
-}
-
-void Socket::Send(SockMessage* message, int _size)
-{
-    int new_sock = client_fd < 0?socket_fd:client_fd;
-    send(new_sock, message, _size, 0);
-    std::cout << "SEND:\n";
-    std::cout << "Type: " << message->messageType << std::endl;
-    std::cout << "Size: " << _size << std::endl;
-    std::cout << "Buff: "; 
-    for(int i=0;i<_size-4;i++)
-    std::cout << (int)message->buffer[i] << " ";
-    std::cout << std::endl;
-}
-
-void Socket::CopyData(std::list<uint8_t> src, uint8_t* dest, uint16_t* size)
-{
-    uint8_t _size = 0;
-    for(auto d : src)
+    memset(message,0,255);
+    
+    read(new_sock, message, 2);
+    if(message->messageType == MESSAGE_LENGTH)
     {
-        dest[_size] = d;
-        _size++;
+        Socket::SockMessage tempMessage;
+        *length = message->buffer[0];
+        read(new_sock, &tempMessage, message->buffer[0]);
+        memset(message,0,sizeof(SockMessage));
+        memcpy(message,&tempMessage,*length);
     }
-    *size = _size + 4;
+}
+
+void Socket::Send(SockMessage* message, uint8_t _size)
+{
+    int new_sock = client_fd < 0?socket_fd:client_fd;
+
+    if(message->messageType != DONE_MESSAGE)
+    {
+        Socket::SockMessage tempMessage;
+        tempMessage.messageType = Socket::MESSAGE_LENGTH;
+        tempMessage.buffer[0] = _size;
+        send(new_sock,&tempMessage,2,0);
+    }
+    send(new_sock, message, _size, 0);
+    memset(message, 0 ,255);
 }
 
 void Socket::Close()
