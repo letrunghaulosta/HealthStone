@@ -2,19 +2,22 @@
 #include <iostream>
 #include <ctime>
 
-void HeroManager::Generate()
+void HeroManager::Generate(uint8_t quantity = 0)
 {
-   uint8_t id = AllocateID();
-   srand(std::time(NULL)^rand());
-   int randomValue = rand() % 100;
-   switch(randomValue%2)
+   for(int i=0;i<quantity;i++)
    {
-      case 0:
-         heroList[id] = new Slark();
-      break;
-      case 1:
-         heroList[id] = new Butcher();
-      break;
+      uint8_t id = AllocateID();
+      srand(std::time(NULL)^rand());
+      int randomValue = rand() % 100;
+      switch(randomValue%2)
+      {
+         case 0:
+            heroList[id] = new Slark();
+         break;
+         case 1:
+            heroList[id] = new Butcher();
+         break;
+      }
    }
 }
 

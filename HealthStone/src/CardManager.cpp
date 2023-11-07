@@ -2,10 +2,10 @@
 #include <iostream>
 #include <ctime>
 
-void CardManager::Generate()
+void CardManager::Generate(uint8_t quantity = 0)
 {
    srand(std::time(NULL)^rand());
-   for(int i=0;i<10;i++)
+   for(int i=0;i<quantity;i++)
    {
       uint8_t id = AllocateID();
       int randomValue1 = rand() % 100;

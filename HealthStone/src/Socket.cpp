@@ -84,34 +84,40 @@ void Socket::Connect()
     }
 }
 
-void Socket::Receive(SockMessage* message, uint8_t* length)
+void Socket::Receive(SockMessage* message, uint16_t* length)
 {
     int new_sock = client_fd < 0?socket_fd:client_fd;
     memset(message,0,255);
-    
-    read(new_sock, message, 2);
+    *length = 0;
+    recv(new_sock, message, 3, 0);
     if(message->messageType == MESSAGE_LENGTH)
     {
-        Socket::SockMessage tempMessage;
-        *length = message->buffer[0];
-        read(new_sock, &tempMessage, message->buffer[0]);
-        memset(message,0,sizeof(SockMessage));
-        memcpy(message,&tempMessage,*length);
+        *length = message->buffer[0] | message->buffer[1] << 8;
+        recv(new_sock, message, *length + 1, 0);
     }
+
+    // std::cout << "#####################" << std::endl;
+    // std::cout << "#RECV, ID: " << (int)message->messageType << " ,LEN: " << (int)*length << "#" << std::endl;
+    // std::cout << "#####################" << std::endl;
 }
 
-void Socket::Send(SockMessage* message, uint8_t _size)
+void Socket::Send(SockMessage* message, uint16_t _size)
 {
     int new_sock = client_fd < 0?socket_fd:client_fd;
+    
+    // std::cout << "#####################" << std::endl;
+    // std::cout << "#SEND, ID: " << (int)message->messageType << " ,LEN: " << (int)_size << "#" << std::endl;
+    // std::cout << "#####################" << std::endl;
 
     if(message->messageType != DONE_MESSAGE)
     {
         Socket::SockMessage tempMessage;
         tempMessage.messageType = Socket::MESSAGE_LENGTH;
-        tempMessage.buffer[0] = _size;
-        send(new_sock,&tempMessage,2,0);
+        tempMessage.buffer[0] = _size&0xff;
+        tempMessage.buffer[1] = (_size >> 8)&0xff;
+        send(new_sock,&tempMessage,3,0);
     }
-    send(new_sock, message, _size, 0);
+    send(new_sock, message, _size + 1, 0);
     memset(message, 0 ,255);
 }
 

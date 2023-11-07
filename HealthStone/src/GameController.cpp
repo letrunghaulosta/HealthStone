@@ -10,20 +10,20 @@ std::vector<bool> UnitManager::unitIdContainer(true);
 void GameController::Start()
 {
    heroManager[GC_PLAYER_1] = new HeroManager();
-   heroManager[GC_PLAYER_1]->Generate();
+   heroManager[GC_PLAYER_1]->Generate(1);
    for(auto heroId : heroManager[GC_PLAYER_1]->GetIdList())
    {
       bonusManager[GC_PLAYER_1][heroId] = {0,0};
    }
    heroManager[GC_PLAYER_2] = new HeroManager();
-   heroManager[GC_PLAYER_2]->Generate();
+   heroManager[GC_PLAYER_2]->Generate(1);
    for(auto heroId : heroManager[GC_PLAYER_2]->GetIdList())
    {
       bonusManager[GC_PLAYER_2][heroId] = {0,0};
    }
 
    cardManager[GC_PLAYER_1] = new CardManager();
-   cardManager[GC_PLAYER_1]->Generate();
+   cardManager[GC_PLAYER_1]->Generate(10);
    unitOnHand[GC_PLAYER_1] = cardManager[GC_PLAYER_1]->GetIdList();
    for(auto unitId : unitOnHand[GC_PLAYER_1])
    {
@@ -31,7 +31,7 @@ void GameController::Start()
    }
 
    cardManager[GC_PLAYER_2] = new CardManager();
-   cardManager[GC_PLAYER_2]->Generate();
+   cardManager[GC_PLAYER_2]->Generate(10);
    unitOnHand[GC_PLAYER_2] = cardManager[GC_PLAYER_2]->GetIdList();
    for(auto unitId : unitOnHand[GC_PLAYER_2])
    {

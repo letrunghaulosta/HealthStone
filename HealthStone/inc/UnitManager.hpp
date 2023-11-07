@@ -13,7 +13,7 @@ typedef std::function<void(int)> UM_OnDestroy_Callback;
 class UnitManager
 {
 public:
-   virtual void Generate(void) = 0;
+   virtual void Generate(uint8_t) = 0;
    virtual void OnAttacked(uint8_t, uint8_t, UM_OnDestroy_Callback) = 0;
    virtual bool GetInformationById(uint8_t, Unit::UnitInfoType*) = 0;
    virtual void Attack(uint8_t) = 0;

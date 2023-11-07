@@ -26,9 +26,9 @@ public:
    void OnLoading(void);
    void OnClientLoading(void);
    void OnPlayerMove(uint8_t);
-   void OnClientMove();
+   void OnClientMove(uint8_t);
    void AfterPlayerMove(uint8_t);
-   void AfterClientMove();
+   void AfterPlayerMoveOnClient();
    void OnProcess();
    void OnHostProcess();
    void OnClientProcess();
@@ -39,6 +39,7 @@ public:
    ConsoleSelectedType GetSelected(){return selected;}
    bool IsExit(){return isExit;}
    void SetExit(){isExit = true;}
+   void HandleMessage(void);
 
 private:
    ConsoleSelectedType selected;

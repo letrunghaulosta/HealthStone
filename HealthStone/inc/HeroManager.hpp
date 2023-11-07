@@ -18,7 +18,7 @@ public:
          }
       }
    }
-   void Generate(void);
+   void Generate(uint8_t);
    void OnAttacked(uint8_t, uint8_t,UM_OnDestroy_Callback);
    bool GetInformationById(uint8_t, Unit::UnitInfoType*);
    void DestroyById(uint8_t);
