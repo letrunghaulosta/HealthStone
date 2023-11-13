@@ -54,7 +54,9 @@ public:
    UnitBonusType*     GetBonusById(uint8_t player,uint8_t id){return &bonusManager[player][id];}
    void PlaceToBattle(uint8_t, uint8_t);
    void SetBonusUnit(uint8_t player,uint8_t id, int16_t damage, int16_t health);
-   // void InformEffective();
+   void RefreshBonusUnit();
+   void SpawnCard();
+   void ActiveRunTimeEffect();
 
    static GameController* GetInstance(){return gcInstance;}
 

@@ -12,7 +12,6 @@ typedef std::function<void(int)> Card_FuncPtrType;
 void TechiesOnDestroyed(uint8_t);
 void BrawlOnDestroyed(uint8_t);
 void ShamanOnRunTimeEffect(uint8_t);
-void ShamanRemoveEffectOnDestroyed(uint8_t);
 
 class Card : public Unit
 {
@@ -90,7 +89,7 @@ const CardConfigType shamanContainer[1] =
          .type = Unit::UNIT_TYPE_SHAMAN
       },
    .runTimeEffect = ShamanOnRunTimeEffect,
-   .destroyEffect = ShamanRemoveEffectOnDestroyed
+   .destroyEffect = NULL
    }
 };
 const CardConfigType spellContainer[1] =

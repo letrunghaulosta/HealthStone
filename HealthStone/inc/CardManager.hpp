@@ -25,6 +25,7 @@ public:
    void Attack(uint8_t){};
    void ActivateRunTimeEffect(uint8_t);
    std::list<uint8_t> GetIdList();
+   uint8_t Spawn();
 private:
    std::map<uint8_t,Card*> cardList;
 };

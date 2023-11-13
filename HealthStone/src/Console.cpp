@@ -428,9 +428,11 @@ void Console::AfterPlayerMoveOnClient()
 
 void Console::OnProcess()
 {
-   // system("clear");
+   GameController::GetInstance()->RefreshBonusUnit();
+   GameController::GetInstance()->ActiveRunTimeEffect();
    cout << "\033[H\033[J";
    cout << "====================================================================\n";
+
    auto heroIdList = GameController::GetInstance()->GetHeroIdList(GC_PLAYER_1);
    auto unitOnTableList = GameController::GetInstance()->GetUnitOnTableIdList(GC_PLAYER_1);
    if(heroIdList.size() == 0)
@@ -477,6 +479,11 @@ void Console::OnProcess()
 
 void Console::OnHostProcess()
 {
+   if(!(GameController::GetInstance()->GetCurrentRound()%2))
+   {
+      GameController::GetInstance()->SpawnCard();
+   }
+
    HandleMessage();
    OnProcess();
 }
@@ -713,6 +720,30 @@ void Console::HandleMessage()
             Socket::GetInstance()->Send(&sendMessage, temp.size());
          }
          break;
+         case Socket::UNIT_ON_BONUS_P1:
+         {   
+            for(int i=0;i<messageLength;i++)
+            {
+               uint8_t id = revMessage.buffer[i];
+               GameController::UnitBonusType* bonusInfo = GameController::GetInstance()->GetBonusById(GC_PLAYER_1,id);
+               memcpy(&sendMessage.buffer[sizeof(GameController::UnitBonusType)*i], bonusInfo, sizeof(GameController::UnitBonusType));
+            }
+            sendMessage.messageType = Socket::UNIT_ON_BONUS_P1;
+            Socket::GetInstance()->Send(&sendMessage,sizeof(GameController::UnitBonusType)*messageLength);
+         }   
+         break;
+         case Socket::UNIT_ON_BONUS_P2:
+         {   
+            for(int i=0;i<messageLength;i++)
+            {
+               uint8_t id = revMessage.buffer[i];
+               GameController::UnitBonusType* bonusInfo = GameController::GetInstance()->GetBonusById(GC_PLAYER_2,id);
+               memcpy(&sendMessage.buffer[sizeof(GameController::UnitBonusType)*i], bonusInfo, sizeof(GameController::UnitBonusType));
+            }
+            sendMessage.messageType = Socket::UNIT_ON_BONUS_P2;
+            Socket::GetInstance()->Send(&sendMessage,sizeof(GameController::UnitBonusType)*messageLength);
+         }   
+         break;         
          case Socket::CLIENT_REQUEST_UNIT_INFO:
          {   
             for(int i=0;i<messageLength;i++)

@@ -129,21 +129,52 @@ void GameController::PlaceToBattle(uint8_t player, uint8_t id)
    unitOnTable[player].push_back(id);
 
    Unit::UnitInfoType unitInfo;
-   CardManager* cardManager = static_cast<CardManager*>(GameController::GetInstance()->GetUnitInformation(id,&unitInfo));
+   CardManager* cardMng = static_cast<CardManager*>(GameController::GetInstance()->GetUnitInformation(id,&unitInfo));
    if(unitInfo.type == Unit::UNIT_TYPE_SPELL)
    {
-      cardManager->OnAttacked(id,0,std::bind(&GameController::RemoveUnitById,GameController::GetInstance(), std::placeholders::_1));
+      cardMng->OnAttacked(id,0,std::bind(&GameController::RemoveUnitById,GameController::GetInstance(), std::placeholders::_1));
    }
    else
    {
-      cardManager->ActivateRunTimeEffect(id);
+      cardMng->ActivateRunTimeEffect(id);
    }
+}
+
+void GameController::ActiveRunTimeEffect()
+{
+   for(auto unitIdList : unitOnTable)
+      for(auto id : unitIdList)
+      {
+         Unit::UnitInfoType unitInfo;
+         CardManager* cardMng = static_cast<CardManager*>(GameController::GetInstance()->GetUnitInformation(id,&unitInfo));
+         cardMng->ActivateRunTimeEffect(id);
+      }
 }
 
 void GameController::SetBonusUnit(uint8_t player,uint8_t id, int16_t damage, int16_t health){
    bonusManager[player][id].damage += damage;
    bonusManager[player][id].health += health;
    std::cout << "Player:" << (int)player << "id:" <<(int)id << "damage:" << bonusManager[player][id].damage << "health:" << bonusManager[player][id].health << std::endl;
+}
+
+void GameController::RefreshBonusUnit()
+{
+   for(auto& bonusMng : bonusManager)
+      for(auto& unit : bonusMng)
+         unit.second = {0};
+}
+
+void GameController::SpawnCard()
+{
+   uint8_t unitId = cardManager[GC_PLAYER_1]->Spawn();
+   unitOnHand[GC_PLAYER_1].push_back(unitId);
+   bonusManager[GC_PLAYER_1][unitId] = {0,0};
+   std::cout << "SPAWN_P1 ID:" << (int)unitId << std::endl; 
+
+   unitId = cardManager[GC_PLAYER_2]->Spawn();
+   unitOnHand[GC_PLAYER_2].push_back(unitId);
+   bonusManager[GC_PLAYER_2][unitId] = {0,0};
+   std::cout << "SPAWN_P2 ID:" << (int)unitId << std::endl;
 }
 
 void TechiesOnDestroyed(uint8_t id)
@@ -209,22 +240,6 @@ void ShamanOnRunTimeEffect(uint8_t id)
       if(unitInfo.type != Unit::UNIT_TYPE_SPELL && cardId != id)
       {
          GameController::GetInstance()->SetBonusUnit(player,cardId,1,0);
-      }
-   }
-}
-
-void ShamanRemoveEffectOnDestroyed(uint8_t id)
-{
-   std::cout << "Shaman[Id" << (int)id << "] has been destroyed: ";
-   uint8_t player = GameController::GetInstance()->GetPlayerByUnitId(id);
-   std::list<uint8_t> cardIdList = GameController::GetInstance()->GetCardIdList(player);
-   for(auto cardId : cardIdList)
-   {
-      Unit::UnitInfoType unitInfo;
-      GameController::GetInstance()->GetUnitInformation(cardId,&unitInfo);
-      if(unitInfo.type != Unit::UNIT_TYPE_SPELL && cardId != id)
-      {
-         GameController::GetInstance()->SetBonusUnit(player,cardId,-1,0);
       }
    }
 }

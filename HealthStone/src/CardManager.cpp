@@ -7,24 +7,29 @@ void CardManager::Generate(uint8_t quantity = 0)
    srand(std::time(NULL)^rand());
    for(int i=0;i<quantity;i++)
    {
-      uint8_t id = AllocateID();
-      int randomValue1 = rand() % 100;
-      int randomValue2 = rand() % 3;
-      switch(randomValue1%5)
-      {
-         case 0:
-         case 1:
-         case 2:
-            cardList[id] = new Minion(randomValue2);
-         break;
-         case 3:
-            cardList[id] = new Shaman(0);
-         break;
-         case 4:
-            cardList[id] = new Spell(0);
-         break;
-      }
+      Spawn();
    }
+}
+
+uint8_t CardManager::Spawn()
+{
+   uint8_t id = AllocateID();
+   int randomValue1 = rand() % 100;
+   int randomValue2 = rand() % 2;
+   switch(randomValue1%4)
+   {
+      case 0:
+      case 1:
+         cardList[id] = new Minion(randomValue2);
+      break;
+      case 2:
+         cardList[id] = new Shaman(0);
+      break;
+      case 3:
+         cardList[id] = new Spell(0);
+      break;
+   }
+   return id;
 }
 
 void CardManager::OnAttacked(uint8_t id, uint8_t damaged, UM_OnDestroy_Callback pfuncCbk)
